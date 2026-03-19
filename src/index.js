@@ -1,27 +1,29 @@
-import 'dotenv/config'
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
 
-BigInt.prototype.toJson = function () {
-    return this.toString()
-}
+import authRoutes from './routes/auth.routes.js';
 
-import express from 'express'
-import cors from 'cors'
-// import { PrismaClient } from '../generated/prisma/index.js'
+// Sebelumnya menggunakan BigInt
+// BigInt.prototype.tojson = function () {
+//     return this.toString();
+// };
 
-const app = express()
-// const prisma = new PrismaClient()
-const PORT = process.env.PORT || 3000
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(cors())
-app.use(express.json())
+app.use(cors());
+app.use(express.json());
+
+app.use('/api/v1/auth', authRoutes);
 
 app.get('/', (req, res) => {
     res.json({
         status: 'success',
         message: 'Server BeinBout Be is running perfectly'
-    })
-})
+    });
+});
 
 app.listen(PORT, () => {
-    console.log(`Server is running in http://localhost:${PORT}`)
-})
+    console.log(`Server is running in http://localhost:${PORT}`);
+});
