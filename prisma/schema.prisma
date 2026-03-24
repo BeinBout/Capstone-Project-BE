@@ -48,7 +48,7 @@ model Quiz {
   total_score Int?
 
   ai_summary String? @db.Text
-  ai_insigths Json? @db.JsonB
+  ai_insights Json? @db.JsonB
 
   started_at DateTime? @db.Timestamp()
   completed_at DateTime? @db.Timestamp()
@@ -151,7 +151,7 @@ model UserPersona {
   risk_level String? @db.VarChar
   risk_score Int?
   dominant_stressor Json? @db.JsonB
-  recomendations Json? @db.JsonB
+  recommendations Json? @db.JsonB
 
   personality_summary String? @db.Text
   weekly_insight String? @db.Text

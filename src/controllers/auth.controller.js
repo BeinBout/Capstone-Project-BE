@@ -25,7 +25,7 @@ export const register = async (req, res) => {
       }
     });
 
-    const token = jwt.sign({ id: newUser.id.toString(), email: newUser.email }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, { expiresIn: '7d' });
 
     const initialQuiz = await prisma.quiz.findFirst({
         where: {
@@ -77,7 +77,7 @@ export const login = async (req, res) => {
 
         const token = jwt.sign(
         {
-            id: user.id.toString(),
+            id: user.id,
             email: user.email,
         }, 
         JWT_SECRET, 
@@ -138,7 +138,7 @@ export const googleOAuth = async (req, res) => {
         }
 
         const token = jwt.sign({
-            id: user.id.toString(),
+            id: user.id,
             email: user.email,
         }, JWT_SECRET, {
             expiresIn: '7d'

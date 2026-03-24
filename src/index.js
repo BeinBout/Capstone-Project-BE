@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 
 import authRoutes from './routes/auth.routes.js';
+import profileAndInpeRoutes from './routes/profile-and-inpe.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 // Sebelumnya menggunakan BigInt
 // BigInt.prototype.tojson = function () {
@@ -11,12 +13,17 @@ import authRoutes from './routes/auth.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const apiVersion = '/api/v1';
+
 
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/v1/auth', authRoutes);
+app.use(apiVersion + '/auth', authRoutes);
+app.use(apiVersion + '/profile-and-inpe', profileAndInpeRoutes);
+app.use(apiVersion + '/admin', adminRoutes);
 
+// For testing only
 app.get('/', (req, res) => {
     res.json({
         status: 'success',
