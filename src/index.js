@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import authRoutes from './routes/auth.routes.js';
 import profileAndInpeRoutes from './routes/profile-and-inpe.routes.js';
+import weeklyCheckupRoutes from './routes/weekly-checkup.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 
 // Sebelumnya menggunakan BigInt
@@ -21,6 +22,7 @@ app.use(express.json());
 
 app.use(apiVersion + '/auth', authRoutes);
 app.use(apiVersion + '/profile-and-inpe', profileAndInpeRoutes);
+app.use(apiVersion + '/weekly-checkup', weeklyCheckupRoutes);
 app.use(apiVersion + '/admin', adminRoutes);
 
 // For testing only
