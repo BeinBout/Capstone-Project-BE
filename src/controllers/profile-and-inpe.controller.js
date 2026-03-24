@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import { generateInitialPersona } from '../utils/aiHelper.js';
+import { generateInitialPersona } from '../utils/aiHelperDummy.js';
 
 export const setupProfileAndQuiz = async (req, res) => {
     try {
