@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import { generateWeeklyCheckup } from '../utils/weeklyAiHelper.js';
+import { generateWeeklyCheckup } from '../utils/aiHelperDummy.js';
 
 export const submitWeeklyCheckup = async (req, res) => {
     try {
