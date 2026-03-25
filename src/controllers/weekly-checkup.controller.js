@@ -149,16 +149,18 @@ export const submitWeeklyCheckup = async (req, res) => {
             await tx.quizAnswer.createMany({ data: answersData });
 
             await tx.userPersona.create({
-                user_id: userId,
-                risk_level: aiResponse.ai_insights.risk_level,
-                risk_score: aiResponse.ai_insights.risk_score,
-                dominant_stressor: aiResponse.ai_insights.dominant_stressor,
-                recomendations: aiResponse.ai_insights.recommendations, // Typo skema
-                personality_summary: aiResponse.ai_insights.personality_summary || aiResponse.ai_insights.presonality_summary,
-                progress_status: aiResponse.ai_insights.progress_status,
-                weekly_insight: aiResponse.ai_insights.weekly_insight,
-                source_type: 'weekly_checkup',
-                source_id: newQuiz.id
+                data: {
+                    user_id: userId,
+                    risk_level: aiResponse.ai_insights.risk_level,
+                    risk_score: aiResponse.ai_insights.risk_score,
+                    dominant_stressor: aiResponse.ai_insights.dominant_stressor,
+                    recommendations: aiResponse.ai_insights.recommendations,
+                    personality_summary: aiResponse.ai_insights.personality_summary || aiResponse.ai_insights.presonality_summary,
+                    progress_status: aiResponse.ai_insights.progress_status,
+                    weekly_insight: aiResponse.ai_insights.weekly_insight,
+                    source_type: 'weekly_checkup',
+                    source_id: newQuiz.id
+                }
             });
 
             return newQuiz;
