@@ -182,3 +182,90 @@ export const submitDailyJournal = async (req, res) => {
         });
     }
 };
+
+export const getJournalsByMonth = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const today = new Date();
+        const queryMonth = req.query.month ? parseInt(req.query.month, 10) : today.getMonth() + 1;
+        const queryYear = req.query.year ? parseInt(req.query.year, 10) : today.getFullYear();
+        const startDate = new Date(queryYear, queryMonth - 1, 1);
+        const endDate = new Date(queryYear, queryMonth, 1);
+
+        const journals = await prisma.journalLog.findMany({
+            where: {
+                user_id: userId,
+                entry_date: {
+                    gte: startDate,
+                    lt: endDate
+                }
+            },
+            select: {
+                id: true,
+                entry_date: true,
+                mood: true,
+                is_private: true
+            },
+            orderBy: {
+                entry_date: 'asc'
+            }
+        });
+
+        res.status(200).json({
+            status: 'success',
+            data: journals
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Internal Server Error',
+            error: error.message
+        });
+    }
+};
+
+const formatTimeBackToString = (dateObj) => {
+    if (!dateObj) return null;
+
+    const h = dateObj.getUTCHours().toString().padStart(2, '0');
+    const m = dateObj.getUTCMinutes().toString().padStart(2, '0');
+    return `${h}:${m}`;
+};
+
+export const getJournalById = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const journalId = parseInt(req.params.id, 10);
+
+        const journal = await prisma.journalLog.findUnique({
+            where: {
+                id: journalId,
+                user_id: userId
+            }
+        });
+
+        if (!journal) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Journal not found'
+            });
+        }
+
+        const formattedJournal = {
+            ...journal,
+            sleep_time: formatTimeBackToString(journal.sleep_time),
+            wake_time: formatTimeBackToString(journal.wake_time),
+        };
+
+        res.status(200).json({
+            status: 'success',
+            data: formattedJournal
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
