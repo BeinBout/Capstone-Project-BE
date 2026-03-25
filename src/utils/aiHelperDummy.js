@@ -55,3 +55,17 @@ export const generateWeeklyCheckup = async (payload) => {
         }
     };
 };
+
+export const analyzeDailyJournal = async (payload) => {
+  console.log('Menjalankan AI Dummy untuk jurnal harian...', payload.journal.mood);
+
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  return {
+    ai_reflection: 'Kamu sedang menghadapi tekanan yang cukup berat hari ini. Menarik napas panjang sejenak mungkin bisa membantu. Aku perhatikan tidurmu juga kurang, usahakan istirahat lebih awal malam ini ya.',
+    ai_tags: ['academic_pressure', 'sleep_deficit', 'frustration'],
+    ai_sentiment_score: -0.72,
+    ai_anomaly_detected: true,
+    ai_anomaly_type: 'sleep_deficit'
+  };
+};
