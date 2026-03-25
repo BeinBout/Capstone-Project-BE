@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 
 import authRoutes from './routes/auth.routes.js';
+import showingQuestionRoutes from './routes/showing-question.routes.js';
 import profileAndInpeRoutes from './routes/profile-and-inpe.routes.js';
 import dailyJournalRoutes from './routes/daily-journal.routes.js';
 import weeklyCheckupRoutes from './routes/weekly-checkup.routes.js';
@@ -22,6 +23,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use(apiVersion + '/auth', authRoutes);
+app.use(apiVersion + '/showing-questions', showingQuestionRoutes);
 app.use(apiVersion + '/profile-and-inpe', profileAndInpeRoutes);
 app.use(apiVersion + '/daily-journal', dailyJournalRoutes);
 app.use(apiVersion + '/weekly-checkup', weeklyCheckupRoutes);
