@@ -12,126 +12,127 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  username String? @unique @db.VarChar
-  email String @unique @db.VarChar
+  id                Int       @id @default(autoincrement())
+  username          String?   @unique @db.VarChar
+  email             String    @unique @db.VarChar
   email_verified_at DateTime? @db.Timestamp()
 
-  password String? @db.VarChar
-  google_id String? @unique @db.VarChar
+  password   String? @db.VarChar
+  google_id  String? @unique @db.VarChar
   avatar_url String? @db.VarChar
 
-  nama_lengkap String? @db.VarChar
-  berat_badan Decimal? @db.Decimal
-  tinggi_badan Int?
-  umur Int?
+  nama_lengkap  String?   @db.VarChar
+  berat_badan   Decimal?  @db.Decimal
+  tinggi_badan  Int?
+  umur          Int?
   tanggal_lahir DateTime? @db.Date
 
   last_login_at DateTime? @db.Timestamp()
-  created_at DateTime @default(now()) @db.Timestamp()
-  updated_at DateTime @updatedAt @db.Timestamp()
+  created_at    DateTime  @default(now()) @db.Timestamp()
+  updated_at    DateTime  @updatedAt @db.Timestamp()
 
   // Relasi
-  quizzes Quiz[]
-  journal_logs JournalLog[]
+  quizzes       Quiz[]
+  journal_logs  JournalLog[]
   user_personas UserPersona[]
 
   @@map("users")
 }
 
 model Quiz {
-  id Int @id @default(autoincrement())
-  user_id Int
-  type String @db.VarChar
-  total_question Int?
-  answered_question Int? @default(0)
-  total_score Int?
+  id                Int    @id @default(autoincrement())
+  user_id           Int
+  type              String @db.VarChar
+  total_question    Int?
+  answered_question Int?   @default(0)
+  total_score       Int?
 
-  ai_summary String? @db.Text
-  ai_insights Json? @db.JsonB
+  ai_summary  String? @db.Text
+  ai_insights Json?   @db.JsonB
 
-  started_at DateTime? @db.Timestamp()
+  started_at   DateTime? @db.Timestamp()
   completed_at DateTime? @db.Timestamp()
-  created_at DateTime @default(now()) @db.Timestamp()
-  updated_at DateTime @updatedAt @db.Timestamp()
+  created_at   DateTime  @default(now()) @db.Timestamp()
+  updated_at   DateTime  @updatedAt @db.Timestamp()
 
   // Relasi
-  user User @relation(fields: [user_id], references: [id])
+  user         User         @relation(fields: [user_id], references: [id])
   quiz_answers QuizAnswer[]
 
   @@map("quizzes")
 }
 
 model QuizQuestion {
-  id Int @id @default(autoincrement())
-  category String @db.VarChar
-  question_text String @db.Text
-  question_type String? @default("multiple_choice") @db.VarChar
-  is_active Boolean? @default(true)
-  created_at DateTime @default(now()) @db.Timestamp()
-  updated_at DateTime @updatedAt @db.Timestamp()
+  id            Int      @id @default(autoincrement())
+  category      String   @db.VarChar
+  question_text String   @db.Text
+  question_type String?  @default("multiple_choice") @db.VarChar
+  quiz_type     String   @default("initial")
+  is_active     Boolean? @default(true)
+  created_at    DateTime @default(now()) @db.Timestamp()
+  updated_at    DateTime @updatedAt @db.Timestamp()
 
   // Relasi
-  options QuizOption[]
+  options      QuizOption[]
   quiz_answers QuizAnswer[]
 
   @@map("quiz_questions")
 }
 
 model QuizOption {
-  id Int @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   question_id Int
-  option_text String @db.VarChar
+  option_text String   @db.VarChar
   score_value Int?
-  emotion_tag String? @db.VarChar
-  created_at DateTime @default(now()) @db.Timestamp()
-  updated_at DateTime @updatedAt @db.Timestamp()
+  emotion_tag String?  @db.VarChar
+  created_at  DateTime @default(now()) @db.Timestamp()
+  updated_at  DateTime @updatedAt @db.Timestamp()
 
   // Relasi
-  question QuizQuestion @relation(fields: [question_id], references: [id])
+  question     QuizQuestion @relation(fields: [question_id], references: [id])
   quiz_answers QuizAnswer[]
 
   @@map("quiz_options")
 }
 
 model QuizAnswer {
-  id Int @id @default(autoincrement())
-  quiz_id Int
-  question_id Int
+  id                 Int       @id @default(autoincrement())
+  quiz_id            Int
+  question_id        Int
   selected_option_id Int?
-  custom_answer String? @db.Text
-  answered_at DateTime? @db.Timestamp()
-  created_at DateTime @default(now()) @db.Timestamp()
+  custom_answer      String?   @db.Text
+  answered_at        DateTime? @db.Timestamp()
+  created_at         DateTime  @default(now()) @db.Timestamp()
 
   // Relasi
-  quiz Quiz @relation(fields: [quiz_id], references: [id])
-  question QuizQuestion @relation(fields: [question_id], references: [id])
-  selected_option QuizOption? @relation(fields: [selected_option_id], references: [id])
+  quiz            Quiz         @relation(fields: [quiz_id], references: [id])
+  question        QuizQuestion @relation(fields: [question_id], references: [id])
+  selected_option QuizOption?  @relation(fields: [selected_option_id], references: [id])
 
   @@map("quiz_answers")
 }
 
 model JournalLog {
-  id Int @id @default(autoincrement())
-  user_id Int
+  id         Int      @id @default(autoincrement())
+  user_id    Int
   entry_date DateTime @db.Date
 
-  mood String? @db.VarChar
-  mood_intensity Int?
-  sleep_time DateTime? @db.Time
-  wake_time DateTime? @db.Time
-  sleep_duration_hours Decimal? @db.Decimal
-  sleep_quality String? @db.VarChar
+  mood                 String?   @db.VarChar
+  mood_intensity       Int?
+  sleep_time           DateTime? @db.Time
+  wake_time            DateTime? @db.Time
+  sleep_duration_hours Decimal?  @db.Decimal
+  sleep_quality        String?   @db.VarChar
 
-  title String? @db.VarChar
-  content String @db.Text
+  title   String? @db.VarChar
+  content String  @db.Text
 
-  ai_reflection String? @db.Text
-  ai_tags Json? @db.JsonB
-  ai_sentiment_score Decimal? @db.Decimal
+  ai_reflection       String?  @db.Text
+  ai_tags             Json?    @db.JsonB
+  ai_sentiment_score  Decimal? @db.Decimal
   ai_anomaly_detected Boolean?
-  ai_anomaly_type String? @db.VarChar
-  ai_low_confidence Boolean? @default(false)
+  ai_anomaly_type     String?  @db.VarChar
+  ai_low_confidence   Boolean? @default(false)
 
   is_private Boolean? @default(true)
   is_deleted Boolean? @default(false)
@@ -146,19 +147,19 @@ model JournalLog {
 }
 
 model UserPersona {
-  id Int @id @default(autoincrement())
-  user_id Int
-  risk_level String? @db.VarChar
-  risk_score Int?
-  dominant_stressor Json? @db.JsonB
-  recommendations Json? @db.JsonB
+  id                Int     @id @default(autoincrement())
+  user_id           Int
+  risk_level        String? @db.VarChar
+  risk_score        Int?
+  dominant_stressor Json?   @db.JsonB
+  recommendations   Json?   @db.JsonB
 
   personality_summary String? @db.Text
-  weekly_insight String? @db.Text
-  progress_status String? @db.VarChar
+  weekly_insight      String? @db.Text
+  progress_status     String? @db.VarChar
 
   source_type String? @db.VarChar
-  source_id BigInt?
+  source_id   BigInt?
 
   created_at DateTime @default(now()) @db.Timestamp()
   updated_at DateTime @updatedAt @db.Timestamp()
