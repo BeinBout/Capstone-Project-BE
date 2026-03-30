@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import redisClient from '../config/redis.js';
 
 export const getQuizQuestions = async (req, res) => {
     try {
@@ -12,6 +13,17 @@ export const getQuizQuestions = async (req, res) => {
         }
 
         if (type === 'initial') {
+            const cachedInitial = await redisClient.get('quiz:initial');
+
+            if (cachedInitial) {
+                console.log('mengambil data dari redis');
+                return res.status(200).json({
+                    status: 'success',
+                    data: JSON.parse(cachedInitial)
+                });
+            }
+
+            console.log('mengambil data dari database');
             const questions = await prisma.quizQuestion.findMany({
                 where: { quiz_type: 'initial' },
                 include: {
@@ -21,6 +33,8 @@ export const getQuizQuestions = async (req, res) => {
                 }
             });
 
+            await redisClient.setEx('quiz:initial', 86400, JSON.stringify(questions));
+
             return res.status(200).json({
                 status: 'success',
                 data: questions
@@ -28,15 +42,31 @@ export const getQuizQuestions = async (req, res) => {
         }
 
         if (type === 'weekly') {
-            const staticQuestions = await prisma.quizQuestion.findMany({
-                where: { quiz_type: 'weekly_static' },
-                include: { options: { orderBy: { score_value: 'asc' } } }
-            });
+            let staticQuestions = [];
+            let randomPool = [];
 
-            const randomPool = await prisma.quizQuestion.findMany({
-                where: { quiz_type: 'weekly_random' },
-                include: { options: { orderBy: { score_value: 'asc' } } }
-            });
+            const cachedWeeklyStatic = await redisClient.get('quiz:weekly_static');
+            const cachedWeeklyRandom = await redisClient.get('quiz:weekly_random');
+
+            if (cachedWeeklyStatic && cachedWeeklyRandom) {
+                console.log('mengambil data dari redis');
+                staticQuestions = JSON.parse(cachedWeeklyStatic);
+                randomPool = JSON.parse(cachedWeeklyRandom);
+            } else {
+                console.log('mengambil data dari database');
+                staticQuestions = await prisma.quizQuestion.findMany({
+                    where: { quiz_type: 'weekly_static' },
+                    include: { options: { orderBy: { score_value: 'asc' } } }
+                });
+    
+                randomPool = await prisma.quizQuestion.findMany({
+                    where: { quiz_type: 'weekly_random' },
+                    include: { options: { orderBy: { score_value: 'asc' } } }
+                });
+
+                await redisClient.setEx('quiz:weekly_static', 86400, JSON.stringify(staticQuestions));
+                await redisClient.setEx('quiz:weekly_random', 86400, JSON.stringify(randomPool));
+            }
 
             const suffledRandom = randomPool
                 .sort(() => 0.5 - Math.random())
