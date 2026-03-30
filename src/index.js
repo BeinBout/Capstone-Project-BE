@@ -21,11 +21,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const apiVersion = process.env.API_VERSION || '/api';
 
-
 app.use(cors());
 app.use(express.json());
 
-app.use(apiVersion + '/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const CSS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css';
+
+app.use(apiVersion + '/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+    customCssUrl: CSS_URL
+}));
 app.use(apiVersion + '/auth', authRoutes);
 app.use(apiVersion + '/showing-questions', showingQuestionRoutes);
 app.use(apiVersion + '/profile-and-inpe', profileAndInpeRoutes);
