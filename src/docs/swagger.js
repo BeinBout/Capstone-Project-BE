@@ -480,7 +480,7 @@ export const swaggerDocument = {
                         description: 'Tipe kuis tidak valid',
                         content: {
                             'application/json': {
-                                schema: { $ref: '#/components/shemas/ErrorResponse' },
+                                schema: { $ref: '#/components/schemas/ErrorResponse' },
                                 example: {
                                     status: 'error',
                                     message: 'Type is required (example: ?type=initial or ?type=random)'
