@@ -1,4 +1,5 @@
 import prisma from '../../config/db.js';
+import redisClient from '../../config/redis.js';
 
 export const getAllQuestions = async (req, res) => {
     try {
@@ -58,6 +59,10 @@ export const createQuestion = async (req, res) => {
                 options: true
             }
         });
+
+        await redisClient.del('quiz:initial');
+        await redisClient.del('quiz:weekly_static');
+        await redisClient.del('quiz:weekly_random');
 
         res.status(201).json({
             status: 'success',
@@ -155,6 +160,10 @@ export const updateQuestion = async (req, res) => {
             }
         });
 
+        await redisClient.del('quiz:initial');
+        await redisClient.del('quiz:weekly_static');
+        await redisClient.del('quiz:weekly_random');
+
         res.status(200).json({
             status: 'success',
             message: 'Question updated successfully',
@@ -186,11 +195,21 @@ export const deleteQuestion = async (req, res) => {
             }
         });
 
+        await prisma.quizAnswer.deleteMany({
+            where: {
+                question_id: questionId
+            }
+        });
+
         const deletedQuestion = await prisma.quizQuestion.delete({
             where: {
                 id: questionId
             },
         });
+
+        await redisClient.del('quiz:initial');
+        await redisClient.del('quiz:weekly_static');
+        await redisClient.del('quiz:weekly_random');
 
         res.status(200).json({
             status: 'success',
