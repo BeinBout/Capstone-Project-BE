@@ -1,5 +1,5 @@
 import prisma from '../config/db.js';
-import { analyzeDailyJournal } from '../utils/aiHelperDummy.js';
+import { analyzeDailyJournal } from '../utils/aiHelper.js';
 
 const calculateSleepDuration = (sleepTime, wakeTime) => {
     if (!sleepTime || !wakeTime) return 0;
