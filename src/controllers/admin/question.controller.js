@@ -186,6 +186,12 @@ export const deleteQuestion = async (req, res) => {
             }
         });
 
+        await prisma.quizAnswer.deleteMany({
+            where: {
+                question_id: questionId
+            }
+        });
+
         const deletedQuestion = await prisma.quizQuestion.delete({
             where: {
                 id: questionId
