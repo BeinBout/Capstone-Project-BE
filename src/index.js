@@ -2,6 +2,9 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 
+import swaggerUi from 'swagger-ui-express';
+import { swaggerDocument } from './docs/swagger.js';
+
 import authRoutes from './routes/auth.routes.js';
 import showingQuestionRoutes from './routes/showing-question.routes.js';
 import profileAndInpeRoutes from './routes/profile-and-inpe.routes.js';
@@ -16,12 +19,13 @@ import adminRoutes from './routes/admin.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const apiVersion = '/api/v1';
+const apiVersion = process.env.API_VERSION || '/api';
 
 
 app.use(cors());
 app.use(express.json());
 
+app.use(apiVersion + '/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(apiVersion + '/auth', authRoutes);
 app.use(apiVersion + '/showing-questions', showingQuestionRoutes);
 app.use(apiVersion + '/profile-and-inpe', profileAndInpeRoutes);
@@ -37,6 +41,15 @@ app.get('/', (req, res) => {
     });
 });
 
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server is running in http://localhost:${PORT}`);
+    });
+}
+
 app.listen(PORT, () => {
     console.log(`Server is running in http://localhost:${PORT}`);
 });
+
+export default app;
