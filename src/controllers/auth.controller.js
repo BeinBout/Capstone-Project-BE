@@ -90,11 +90,21 @@ export const login = async (req, res) => {
             data: { last_login_at: new Date() }
         });
 
+        const initialQuiz = await prisma.quiz.findFirst({
+            where: {
+                user_id: user.id,
+                type: 'initial_persona'
+            }
+        });
+
+        const has_completed_quiz = initialQuiz ? true : false;
+
         res.status(200).json({
             status: 'success',
             message: 'Login successful!',
             data: {
                 user,
+                has_completed_quiz,
                 token
             }
         });
