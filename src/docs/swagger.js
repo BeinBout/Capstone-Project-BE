@@ -406,6 +406,66 @@ export const swaggerDocument = {
                 },
             }
         },
+        '/api/v1/auth/verify/me': {
+            get: {
+                tags: ['Authentication'],
+                summary: 'Verifikasi pengguna saat ini',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: 'User sudah terverifikasi dan data berhasil diambil',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/SuccessResponse' },
+                                example: {
+                                    status: 'success',
+                                    data: {
+                                        id: 6,
+                                        username: 'Irfan Daffa',
+                                        email: 'irfndappa@gmail.com',
+                                        email_verified_at: null,
+                                        google_id: '107231312472479427',
+                                        avatar_url: 'avatar_url',
+                                        nama_lengkap: null,
+                                        berat_badan: null,
+                                        tinggi_badan: null,
+                                        umur: null,
+                                        tanggal_lahir: null,
+                                        last_login_at: '2023-03-30T08:00:14.868Z',
+                                        created_at: '2023-03-30T08:00:14.887Z',
+                                        updated_at: '2023-03-30T08:00:14.887Z'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    403: {
+                        description: 'Token tidak valid atau kadaluarsa',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/ErrorResponse' },
+                                example: {
+                                    status: 'error',
+                                    message: 'Token is invalid or expired'
+                                }
+                            }
+                        }
+                    },
+                    500: {
+                        description: 'Terjadi kesalahan server',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/ErrorResponse' },
+                                example: {
+                                    status: 'error',
+                                    message: 'A server error occurred',
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         '/api/v1/auth/logout': {
             post: {
                 tags: ['Authentication'],
