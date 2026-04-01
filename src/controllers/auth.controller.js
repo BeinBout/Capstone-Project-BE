@@ -203,6 +203,64 @@ export const googleOAuth = async (req, res) => {
     }
 };
 
+export const verifyMe = async (req, res) => {
+    const authHeader = req.headers['authorization'];
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({
+            status: 'error',
+            message: 'Access denied. Token not found.'
+        });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'BeinB0ut123()!!');
+
+        if (!decoded) {
+            return res.status(403).json({
+                status: 'error',
+                message: 'Token is invalid or expired.'
+            });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: decoded.id
+            },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                email_verified_at: true,
+                google_id: true,
+                avatar_url: true,
+                nama_lengkap: true,
+                berat_badan: true,
+                tinggi_badan: true,
+                umur: true,
+                tanggal_lahir: true,
+                last_login_at: true,
+                created_at: true,
+                updated_at: true
+            }
+        });
+        console.log(user);
+
+        res.status(200).json({
+            status: 'success',
+            data: user
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'A server error occurred',
+            error: error.message
+        });
+    }
+};
+
 // Penjelasan: Dalam sistem JWT, logout sebenarnya dilakukan oleh Frontend (dengan menghapus token di LocalStorage).
 // Backend hanya perlu merespon sukses.
 export const logout = async (req, res) => {
