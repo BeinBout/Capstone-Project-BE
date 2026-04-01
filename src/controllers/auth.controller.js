@@ -5,53 +5,53 @@ import prisma from '../config/db.js';
 const JWT_SECRET = process.env.JWT_SECRET || 'rahasia_negara_123';
 
 export const register = async (req, res) => {
-  try {
-    const { email, password, username } = req.body;
+    try {
+        const { email, password, username } = req.body;
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) return res.status(400).json({
-        status: 'error',
-        message: 'Email already exists'
-    });
+        const existingUser = await prisma.user.findUnique({ where: { email } });
+        if (existingUser) return res.status(400).json({
+            status: 'error',
+            message: 'Email already exists'
+        });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await prisma.user.create({
-      data: { 
-        email, 
-        username, 
-        password: hashedPassword,
-        last_login_at: new Date()
-      }
-    });
+        const newUser = await prisma.user.create({
+            data: { 
+                email, 
+                username, 
+                password: hashedPassword,
+                last_login_at: new Date()
+            }
+        });
 
-    const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, { expiresIn: '7d' });
 
-    const initialQuiz = await prisma.quiz.findFirst({
-        where: {
-            user_id: newUser.id,
-            type: 'initial_persona'
-        }
-    });
+        const initialQuiz = await prisma.quiz.findFirst({
+            where: {
+                user_id: newUser.id,
+                type: 'initial_persona'
+            }
+        });
 
-    const has_completed_quiz = initialQuiz ? true : false;
+        const has_completed_quiz = initialQuiz ? true : false;
 
-    res.status(201).json({
-      status: 'success',
-      message: 'Register successful!', 
-      data: {
-        newUser,
-        has_completed_quiz,
-        token
-      }
-    });
-  } catch (error) {
-    res.status(500).json({
-        status: 'error',
-        message: 'A server error occurred',
-        error: error.message
-    });
-  }
+        res.status(201).json({
+            status: 'success',
+            message: 'Register successful!', 
+            data: {
+                newUser,
+                has_completed_quiz,
+                token
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'A server error occurred',
+            error: error.message
+        });
+    }
 };
 
 export const login = async (req, res) => {
@@ -97,6 +97,16 @@ export const login = async (req, res) => {
             }
         });
 
+        const profileUser = await prisma.user.findFirst({
+            where: {
+                id: user.id,
+                berat_badan: { not: null },
+                tinggi_badan: { not: null },
+                umur: { not: null },
+            }
+        });
+
+        const has_completed_profile = profileUser ? true : false;
         const has_completed_quiz = initialQuiz ? true : false;
 
         res.status(200).json({
@@ -105,6 +115,7 @@ export const login = async (req, res) => {
             data: {
                 user,
                 has_completed_quiz,
+                has_completed_profile,
                 token
             }
         });
@@ -161,6 +172,16 @@ export const googleOAuth = async (req, res) => {
             }
         });
 
+        const userProfile = await prisma.user.findFirst({
+            where: {
+                id: user.id,
+                berat_badan: { not: null },
+                tinggi_badan: { not: null },
+                umur: { not: null },
+            }
+        });
+
+        const has_completed_profile = userProfile ? true : false;
         const has_completed_quiz = initialQuiz ? true : false;
 
         res.status(200).json({
@@ -169,6 +190,7 @@ export const googleOAuth = async (req, res) => {
             data: {
                 user,
                 has_completed_quiz,
+                has_completed_profile,
                 token
             }
         });
