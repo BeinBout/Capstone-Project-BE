@@ -16,14 +16,12 @@ export const getQuizQuestions = async (req, res) => {
             const cachedInitial = await redisClient.get('quiz:initial');
 
             if (cachedInitial) {
-                console.log('mengambil data dari redis');
                 return res.status(200).json({
                     status: 'success',
                     data: JSON.parse(cachedInitial)
                 });
             }
 
-            console.log('mengambil data dari database');
             const questions = await prisma.quizQuestion.findMany({
                 where: { quiz_type: 'initial' },
                 include: {
@@ -49,11 +47,9 @@ export const getQuizQuestions = async (req, res) => {
             const cachedWeeklyRandom = await redisClient.get('quiz:weekly_random');
 
             if (cachedWeeklyStatic && cachedWeeklyRandom) {
-                console.log('mengambil data dari redis');
                 staticQuestions = JSON.parse(cachedWeeklyStatic);
                 randomPool = JSON.parse(cachedWeeklyRandom);
             } else {
-                console.log('mengambil data dari database');
                 staticQuestions = await prisma.quizQuestion.findMany({
                     where: { quiz_type: 'weekly_static' },
                     include: { options: { orderBy: { score_value: 'asc' } } }

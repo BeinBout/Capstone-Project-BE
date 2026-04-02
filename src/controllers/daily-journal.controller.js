@@ -193,13 +193,11 @@ export const getJournalsByMonth = async (req, res) => {
         const cachedJournal = await redisClient.get(`journals:${req.user.id}:${req.query.month}:${req.query.year}`);
 
         if (cachedJournal) {
-            console.log('mengambil data dari redis');
             res.status(200).json({
                 status: 'success',
                 data: JSON.parse(cachedJournal)
             });
         } else {
-            console.log('mengambil data dari database');
             const userId = req.user.id;
             const today = new Date();
             const queryMonth = req.query.month ? parseInt(req.query.month, 10) : today.getMonth() + 1;
