@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import redisClient from '../config/redis.js';
 import { analyzeDailyJournal } from '../utils/aiHelper.js';
 
 const calculateSleepDuration = (sleepTime, wakeTime) => {
@@ -79,6 +80,8 @@ export const submitDailyJournal = async (req, res) => {
                     is_private: true
                 }
             });
+
+            await redisClient.del(`journals:${userId}:${inputDate.getMonth()+1}:${inputDate.getFullYear()}`);
 
             return res.status(201).json({
                 status: 'success',
@@ -164,6 +167,8 @@ export const submitDailyJournal = async (req, res) => {
             }
         });
 
+        await redisClient.del(`journals:${userId}:${inputDate.getMonth()+1}:${inputDate.getFullYear()}`);
+
         return res.status(201).json({
             status: 'success',
             message: 'Journal successfully saved',
@@ -185,36 +190,48 @@ export const submitDailyJournal = async (req, res) => {
 
 export const getJournalsByMonth = async (req, res) => {
     try {
-        const userId = req.user.id;
-        const today = new Date();
-        const queryMonth = req.query.month ? parseInt(req.query.month, 10) : today.getMonth() + 1;
-        const queryYear = req.query.year ? parseInt(req.query.year, 10) : today.getFullYear();
-        const startDate = new Date(queryYear, queryMonth - 1, 1);
-        const endDate = new Date(queryYear, queryMonth, 1);
+        const cachedJournal = await redisClient.get(`journals:${req.user.id}:${req.query.month}:${req.query.year}`);
 
-        const journals = await prisma.journalLog.findMany({
-            where: {
-                user_id: userId,
-                entry_date: {
-                    gte: startDate,
-                    lt: endDate
+        if (cachedJournal) {
+            res.status(200).json({
+                status: 'success',
+                data: JSON.parse(cachedJournal)
+            });
+        } else {
+            const userId = req.user.id;
+            const today = new Date();
+            const queryMonth = req.query.month ? parseInt(req.query.month, 10) : today.getMonth() + 1;
+            const queryYear = req.query.year ? parseInt(req.query.year, 10) : today.getFullYear();
+            const startDate = new Date(queryYear, queryMonth - 1, 1);
+            const endDate = new Date(queryYear, queryMonth, 1);
+    
+            const journals = await prisma.journalLog.findMany({
+                where: {
+                    user_id: userId,
+                    entry_date: {
+                        gte: startDate,
+                        lt: endDate
+                    }
+                },
+                select: {
+                    id: true,
+                    entry_date: true,
+                    mood: true,
+                    is_private: true
+                },
+                orderBy: {
+                    entry_date: 'asc'
                 }
-            },
-            select: {
-                id: true,
-                entry_date: true,
-                mood: true,
-                is_private: true
-            },
-            orderBy: {
-                entry_date: 'asc'
-            }
-        });
+            });
 
-        res.status(200).json({
-            status: 'success',
-            data: journals
-        });
+            await redisClient.setEx(`journals:${userId}:${queryMonth}:${queryYear}`, 86400, JSON.stringify(journals));
+
+            res.status(200).json({
+                status: 'success',
+                data: journals
+            });
+        }
+
     } catch (error) {
         res.status(500).json({
             status: 'error',
