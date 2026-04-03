@@ -246,11 +246,24 @@ export const verifyMe = async (req, res) => {
                 updated_at: true
             }
         });
-        console.log(user);
+
+        const initialQuiz = await prisma.quiz.findFirst({
+            where: {
+                user_id: user.id,
+                type: 'initial_persona'
+            }
+        });
+
+        const has_completed_profile = user.berat_badan && user.tinggi_badan && user.umur ? true : false;
+        const has_completed_quiz = initialQuiz ? true : false;
 
         res.status(200).json({
             status: 'success',
-            data: user
+            data: {
+                user,
+                has_completed_quiz,
+                has_completed_profile
+            }
         });
     } catch (error) {
         res.status(500).json({
