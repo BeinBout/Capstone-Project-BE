@@ -667,6 +667,126 @@ export const swaggerDocument = {
                 }
             }
         },
+        '/api/v1/dashboard/stats': {
+            get: {
+                tags: ['Dashboard'],
+                summary: 'Mengambil statistik dashboard',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: 'Berhasil mengambil statistik dashboard',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/SuccessResponse' },
+                                example: {
+                                    status: 'success',
+                                    data: {
+                                        risk_level: 'low',
+                                        risk_score: 15,
+                                        dominant_stressor: [
+                                            'excessive_worry',
+                                            'sleep_disorder',
+                                            'loss_of_control',
+                                        ],
+                                        progress_status: 'new',
+                                        sleep_quality: 'poor',
+                                        mood: 'anxious'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    500: {
+                        description: 'Terjadi kesalahan server',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/ErrorResponse' },
+                                example: {
+                                    status: 'error',
+                                    message: 'Internal Server Error'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        '/api/v1/dashboard/main': {
+            get: {
+                tags: ['Dashboard'],
+                summary: 'Mengambil data dashboard utama',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: 'Berhasil mengambil statistik dashboard',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/SuccessResponse' },
+                                example: {
+                                    status: 'success',
+                                    data: {
+                                        recommendations: [
+                                            {
+                                                focus: 'Rutinitas Tidur',
+                                                description: 'Karena kamu sering mengalami kesulitan tidur, coba buat ritual sebelum tidur 1 jam sebelumnya: matikan layar, dengarkan musik tenang, atau tulis 3 hal yang kamu syukuri hari ini. Ini bisa membantu menenangkan pikiran yang sering overthinking.'
+                                            },
+                                        ],
+                                        weekly_insight: null
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    500: {
+                        description: 'Terjadi kesalahan server',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/ErrorResponse' },
+                                example: {
+                                    status: 'error',
+                                    message: 'Internal Server Error'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        '/api/v1/dashboard/is-wc-available': {
+            get: {
+                tags: ['Dashboard'],
+                summary: 'Mengecek apakah weekly checkup tersedia',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: 'Berhasil mengecek weekly checkup',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/SuccessResponse' },
+                                example: {
+                                    status: 'success',
+                                    data: {
+                                        is_available: false
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    500: {
+                        description: 'Terjadi kesalahan server',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/ErrorResponse' },
+                                example: {
+                                    status: 'error',
+                                    message: 'Internal Server Error'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         '/api/v1/daily-journal': {
             get: {
                 tags: ['Daily Journal'],

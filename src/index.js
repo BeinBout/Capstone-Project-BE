@@ -8,6 +8,7 @@ import { swaggerDocument } from './docs/swagger.js';
 import authRoutes from './routes/auth.routes.js';
 import showingQuestionRoutes from './routes/showing-question.routes.js';
 import profileAndInpeRoutes from './routes/profile-and-inpe.routes.js';
+import dashboardRoutes from './routes/dashboard.routes.js';
 import dailyJournalRoutes from './routes/daily-journal.routes.js';
 import weeklyCheckupRoutes from './routes/weekly-checkup.routes.js';
 import adminRoutes from './routes/admin.routes.js';
@@ -37,6 +38,7 @@ app.use(apiVersion + '/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocume
 app.use(apiVersion + '/auth', authRoutes);
 app.use(apiVersion + '/showing-questions', showingQuestionRoutes);
 app.use(apiVersion + '/profile-and-inpe', profileAndInpeRoutes);
+app.use(apiVersion + '/dashboard', dashboardRoutes);
 app.use(apiVersion + '/daily-journal', dailyJournalRoutes);
 app.use(apiVersion + '/weekly-checkup', weeklyCheckupRoutes);
 app.use(apiVersion + '/admin', adminRoutes);
