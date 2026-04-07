@@ -619,10 +619,7 @@ export const swaggerDocument = {
                                                     focus: 'Kualitas Tidur',
                                                     description: 'Coba tetapkan jam tidur yang sama selama 3 hari ke depan, matikan layar gadget 30 menit sebelum tidur.',
                                                 },
-                                                {
-                                                    focus: 'Manajemen Ekspetasi',
-                                                    description: 'Pecah tugas akademikmu menjadi bagian-bagian kecil agar tidak terasa terlalu mengintimidasi.'
-                                                }
+                                                '...'
                                             ],
                                             progress_status: null,
                                             weekly_insight: null,
@@ -718,7 +715,7 @@ export const swaggerDocument = {
                 security: [{ bearerAuth: [] }],
                 responses: {
                     200: {
-                        description: 'Berhasil mengambil statistik dashboard',
+                        description: 'Berhasil mengambil data dashboard utama',
                         content: {
                             'application/json': {
                                 schema: { $ref: '#/components/schemas/SuccessResponse' },
@@ -730,9 +727,60 @@ export const swaggerDocument = {
                                                 focus: 'Rutinitas Tidur',
                                                 description: 'Karena kamu sering mengalami kesulitan tidur, coba buat ritual sebelum tidur 1 jam sebelumnya: matikan layar, dengarkan musik tenang, atau tulis 3 hal yang kamu syukuri hari ini. Ini bisa membantu menenangkan pikiran yang sering overthinking.'
                                             },
+                                            '...'
                                         ],
                                         weekly_insight: null
                                     }
+                                }
+                            }
+                        }
+                    },
+                    500: {
+                        description: 'Terjadi kesalahan server',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/ErrorResponse' },
+                                example: {
+                                    status: 'error',
+                                    message: 'Internal Server Error'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        '/api/v1/dashboard/chart': {
+            get: {
+                tags: ['Dashboard'],
+                summary: 'Mengambil data chart dashboard',
+                security: [{ bearerAuth: [] }],
+                responses: {
+                    200: {
+                        description: 'Berhasil mengambil data chart dashboard dari hari ini sampai 6 hari kebelakang.',
+                        content: {
+                            'application/json': {
+                                schema: { $ref: '#/components/schemas/SuccessResponse' },
+                                example: {
+                                    status: 'success',
+                                    data: [
+                                        {
+                                            date: '2026-04-01',
+                                            mood_intensity: 4,
+                                            sleep_duration_hours: 6.8,
+                                        },
+                                        {
+                                            date: '2026-04-02',
+                                            mood_intensity: 4,
+                                            sleep_duration_hours: 6.8,
+                                        },
+                                        {
+                                            date: '2026-04-02',
+                                            mood_intensity: 4,
+                                            sleep_duration_hours: 6.8,
+                                        },
+                                        '...'
+                                    ]
                                 }
                             }
                         }
@@ -826,7 +874,8 @@ export const swaggerDocument = {
                                             entry_date: '2023-06-02', 
                                             mood: 'sad', 
                                             is_private: true 
-                                        }
+                                        },
+                                        '...'
                                     ]
                                 }
                             }
@@ -1108,7 +1157,8 @@ export const swaggerDocument = {
                                                 {
                                                     focus: 'Tidur',
                                                     description: 'Tidurmu rata-rata 8 jam minggu ini...'
-                                                }
+                                                },
+                                                '...'
                                             ],
                                             progress_status: 'stable',
                                             weekly_insight: 'Pekan ini menunjukkan peningkatan...',
