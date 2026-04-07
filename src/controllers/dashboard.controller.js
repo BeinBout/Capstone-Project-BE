@@ -67,8 +67,8 @@ export const getDashboardChart = async (req, res) => {
         const userId = req.user.id;
 
         const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        sevenDaysAgo.setHours(0, 0, 0, 0);
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+        sevenDaysAgo.setUTCHours(0, 0, 0, 0);
 
         const logs = await prisma.journalLog.findMany({
             where: {
