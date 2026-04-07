@@ -37,8 +37,8 @@ export const submitDailyJournal = async (req, res) => {
         const inputDate = new Date(journal_date);
         const today = new Date();
 
-        inputDate.setHours(0, 0, 0, 0);
-        today.setHours(0, 0, 0, 0);
+        inputDate.setUTCHours(0, 0, 0, 0);
+        today.setUTCHours(0, 0, 0, 0);
 
         if (inputDate > today) {
             return res.status(400).json({
@@ -53,6 +53,7 @@ export const submitDailyJournal = async (req, res) => {
                 entry_date: inputDate
             }
         });
+        console.log(existingJournal);
 
         if (existingJournal) {
             return res.status(400).json({

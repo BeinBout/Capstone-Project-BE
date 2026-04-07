@@ -159,7 +159,7 @@ model UserPersona {
   progress_status     String? @db.VarChar
 
   source_type String? @db.VarChar
-  source_id   BigInt?
+  source_id   Int?
 
   created_at DateTime @default(now()) @db.Timestamp()
   updated_at DateTime @updatedAt @db.Timestamp()
