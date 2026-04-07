@@ -256,7 +256,6 @@ export const verifyMe = async (req, res) => {
 
         const has_completed_profile = user.berat_badan && user.tinggi_badan && user.umur ? true : false;
         const has_completed_quiz = initialQuiz ? true : false;
-
         res.status(200).json({
             status: 'success',
             data: {

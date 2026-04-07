@@ -20,7 +20,7 @@ import adminRoutes from './routes/admin.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const apiVersion = process.env.API_VERSION || '/api';
+const apiVersion = process.env.API_VERSION || '/api/v1';
 
 app.use(cors());
 app.use(express.json());

@@ -14,10 +14,20 @@ export const setupProfileAndQuiz = async (req, res) => {
 
         const existingUser = await prisma.user.findUnique({
             where: { id: userId },
-            select: { nama_lengkap: true }
+            select: { 
+                nama_lengkap: true,
+                berat_badan: true,
+                tinggi_badan: true,
+                umur: true
+            }
         });
 
-        if (existingUser.nama_lengkap) {
+        const isProfileComplete = 
+            existingUser.berat_badan !== null && 
+            existingUser.tinggi_badan !== null && 
+            existingUser.umur !== null;
+
+        if (isProfileComplete) {
             return res.status(400).json({
                 status: 'error',
                 message: 'Profile has been filled in'
