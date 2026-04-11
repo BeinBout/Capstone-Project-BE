@@ -2,6 +2,18 @@
 
 BeinBout adalah platform API backend yang dirancang untuk mendukung aplikasi pelacakan kesehatan mental, jurnal harian, dan analisis psikologis berbasis AI. Dibangun dengan fokus pada performa dan keamanan menggunakan Node.js, Express, dan Prisma ORM.
 
+### Team ID: CC26 - PS072
+
+### Nama Anggota
+
+1. CFS250D6Y309 - Muhamad Nadira Fabyansyah (Project Manager & AI Engineer)
+2. CFS134D6Y504	- Agung Arya Dwipa Laksana (Back-end Developer)
+3. CFS134D6Y415 - Kaka Kendra Nugraha (Front-end Developer)
+4. CFS296D6Y591 - Muhammad Irfan Daffa' Ardianto (Front-end Developer)
+5. CFS134D6Y584 - Denisyal Hendra Putra (Front-end Developer)
+
+---
+
 ## Fitur Utama
 
 - **Autentikasi**: Sistem registrasi dan login menggunakan JWT (JSON Web Tokens).
