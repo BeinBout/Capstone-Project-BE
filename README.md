@@ -1,6 +1,6 @@
 # BeinBout Backend API
 
-BeinBout adalah platform API backend yang dirancang untuk mendukung aplikasi pelacakan kesehatan mental, jurnal harian, dan analisis psikologis berbasis AI. Dibangun dengan fokus pada performa dan keamanan menggunakan Node.js, Express, dan Prisma ORM.
+Repository ini adalah API backend yang dirancang untuk mendukung aplikasi pelacakan kesehatan mental, jurnal harian, dan analisis psikologis berbasis AI yang akan digunakan di aplikasi BeinBout. Dibangun dengan fokus pada performa dan keamanan menggunakan Node.js, Express, dan Prisma ORM.
 
 ### Team ID: CC26 - PS072
 
