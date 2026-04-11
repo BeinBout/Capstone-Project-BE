@@ -32,7 +32,7 @@ Repository ini adalah API backend yang dirancang untuk mendukung aplikasi pelaca
 - **ORM**: [Prisma](https://www.prisma.io/)
 - **Database**: [PostgreSQL (Supabase)](https://supabase.com/)
 - **Caching/Session**: [Redis](https://redis.io/)
-- **Deployment**: [Vercel](https://vercel.com/) (Serverless Functions)
+- **Deployment**: [Vercel](https://vercel.com/) (Serverless Functions) atau Docker
 
 ---
 
