@@ -1,19 +1,19 @@
-# 🧠 BeinBout Backend API
+# BeinBout Backend API
 
 BeinBout adalah platform API backend yang dirancang untuk mendukung aplikasi pelacakan kesehatan mental, jurnal harian, dan analisis psikologis berbasis AI. Dibangun dengan fokus pada performa dan keamanan menggunakan Node.js, Express, dan Prisma ORM.
 
-## ✨ Fitur Utama
+## Fitur Utama
 
-- **🔐 Autentikasi**: Sistem registrasi dan login menggunakan JWT (JSON Web Tokens).
-- **📝 Daily Journal**: Pencatatan jurnal harian yang mencakup metrik mood, intensitas, jam tidur, dan kualitas tidur.
-- **📊 Dashboard Analytics**: Penyediaan data chart harian untuk memantau fluktuasi mood dan durasi tidur selama 7 hari terakhir.
-- **👤 User Persona & Questionnaires**: Asesmen psikologis awal dan mingguan berbasis standar medis (PHQ-9, GAD-7, PSQI, dll).
-- **🤖 AI Integration**: Analisis sentimen, deteksi anomali, dan refleksi AI pada setiap entri jurnal (Via External AI Service).
-- **📚 API Documentation**: Dokumentasi interaktif menggunakan Swagger UI.
+- **Autentikasi**: Sistem registrasi dan login menggunakan JWT (JSON Web Tokens).
+- **Daily Journal**: Pencatatan jurnal harian yang mencakup metrik mood, intensitas, jam tidur, dan kualitas tidur.
+- **Dashboard Analytics**: Penyediaan data chart harian untuk memantau fluktuasi mood dan durasi tidur selama 7 hari terakhir.
+- **User Persona & Questionnaires**: Asesmen psikologis awal dan mingguan berbasis standar medis (PHQ-9, GAD-7, PSQI, dll).
+- **AI Integration**: Analisis sentimen, deteksi anomali, dan refleksi AI pada setiap entri jurnal (Via External AI Service).
+- **API Documentation**: Dokumentasi interaktif menggunakan Swagger UI.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Runtime**: [Node.js](https://nodejs.org/)
 - **Framework**: [Express.js](https://expressjs.com/)
@@ -24,7 +24,7 @@ BeinBout adalah platform API backend yang dirancang untuk mendukung aplikasi pel
 
 ---
 
-## 🚀 Cara Menjalankan Proyek (Local Development)
+## Cara Menjalankan Proyek (Local Development)
 
 ### 1. Prasyarat
 Pastikan kamu sudah menginstal perangkat lunak berikut di komputermu:
@@ -84,15 +84,15 @@ Server akan berjalan di `http://localhost:3000`
 
 ---
 
-## 📖 Dokumentasi API
+## Dokumentasi API
 Proyek ini dilengkapi dengan Swagger UI untuk memudahkan testing dan integrasi dengan Frontend.
 Setelah server berjalan, buka URL berikut di browser kamu:
 
-👉 `http://localhost:3000/api-docs` (Sesuaikan dengan rute Swagger kamu)
+> `http://localhost:3000/api-docs` (Sesuaikan dengan rute Swagger kamu)
 
 ---
 
-## 🏗️ Struktur Folder Utama
+## Struktur Folder Utama
 
 ```
 beinbout/
@@ -110,7 +110,7 @@ beinbout/
 
 ---
 
-## 💡 Catatan Tambahan (Developer Notes)
+## Catatan Tambahan (Developer Notes)
 - **BigInt Serialization:** Proyek ini sudah diatur untuk meng-handle masalah serialisasi `BigInt` dari PostgreSQL ke JSON agar kompatibel dengan Express `res.json()`.
 - **Timezone Handling:** Semua pengiriman tanggal via API (seperti fitur jurnal) telah dinormalisasi menggunakan **UTC** (`setUTCHours`) untuk mencegah bug zona waktu saat di-deploy ke Vercel.
 
