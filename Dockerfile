@@ -3,6 +3,8 @@ FROM node:25.8.0 AS deps
 WORKDIR /app
 
 COPY package*.json ./
+COPY prisma ./prisma/
+
 RUN npm ci --only=production && \
     npm cache clean --force
 
@@ -11,6 +13,8 @@ FROM node:25.8.0 AS builder
 WORKDIR /app
 
 COPY package*.json ./
+COPY prisma ./prisma/ 
+
 RUN npm ci
 
 COPY . .
