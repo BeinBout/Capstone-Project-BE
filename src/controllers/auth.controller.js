@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../config/db.js';
+import dayjs from '../utils/dayjs.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'rahasia_negara_123';
 
@@ -21,7 +22,7 @@ export const register = async (req, res) => {
                 email, 
                 username, 
                 password: hashedPassword,
-                last_login_at: new Date()
+                last_login_at: dayjs().tz('Asia/Jakarta').toDate()
             }
         });
 
@@ -87,7 +88,7 @@ export const login = async (req, res) => {
 
         await prisma.user.update({
             where: { id: user.id },
-            data: { last_login_at: new Date() }
+            data: { last_login_at: dayjs().tz('Asia/Jakarta').toDate() }
         });
 
         const initialQuiz = await prisma.quiz.findFirst({
@@ -144,14 +145,14 @@ export const googleOAuth = async (req, res) => {
                     avatar_url,
                     google_id,
                     username: `${baseUsername}${randomNumber}`,
-                    last_login_at: new Date()
+                    last_login_at: dayjs().tz('Asia/Jakarta').toDate()
                 }
             });
         } else {
             user = await prisma.user.update({
                 where: { email },
                 data: {
-                    last_login_at: new Date(),
+                    last_login_at: dayjs().tz('Asia/Jakarta').toDate(),
                     avatar_url,
                     google_id
                 }

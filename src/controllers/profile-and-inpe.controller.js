@@ -1,5 +1,6 @@
 import prisma from '../config/db.js';
 import { generateInitialPersona } from '../utils/aiHelper.js';
+import dayjs from '../utils/dayjs.js';
 
 export const setupProfileAndQuiz = async (req, res) => {
     try {
@@ -80,6 +81,7 @@ export const setupProfileAndQuiz = async (req, res) => {
         };
 
         const aiResponse = await generateInitialPersona(aiPayload);
+        const now = dayjs().tz('Asia/Jakarta').toDate();
         const result = await  prisma.$transaction(async (tx) => {
             await tx.user.update({
                 where: { id: userId },
@@ -97,8 +99,8 @@ export const setupProfileAndQuiz = async (req, res) => {
                     total_score: total_score,
                     ai_summary: aiResponse.ai_summary,
                     ai_insights: aiResponse.ai_insights,
-                    started_at: new Date(),
-                    completed_at: new Date()
+                    started_at: now,
+                    completed_at: now
                 }
             });
 
@@ -106,7 +108,7 @@ export const setupProfileAndQuiz = async (req, res) => {
                 quiz_id: newQuiz.id,
                 question_id: ans.question_id,
                 selected_option_id: ans.selected_option_id,
-                answered_at: new Date()
+                answered_at: now
             }));
             await tx.quizAnswer.createMany({ data: answersData });
 

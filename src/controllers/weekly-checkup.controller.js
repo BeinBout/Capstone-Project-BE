@@ -1,5 +1,6 @@
 import prisma from '../config/db.js';
 import { generateWeeklyCheckup } from '../utils/aiHelper.js';
+import dayjs from '../utils/dayjs.js';
 
 export const submitWeeklyCheckup = async (req, res) => {
     try {
@@ -18,9 +19,9 @@ export const submitWeeklyCheckup = async (req, res) => {
             });
         }
 
-        const now = new Date();
-        const lastQuizDate = new Date(lastQuiz.completed_at);
-        const diffDays = Math.ceil(Math.abs(now - lastQuizDate) / (1000 * 60 * 60 * 24));
+        const now = dayjs().tz('Asia/Jakarta');
+        const lastQuizDate = dayjs(lastQuiz.completed_at).tz('Asia/Jakarta');
+        const diffDays = now.startOf('day').diff(lastQuizDate.startOf('day'), 'day');
 
         if (diffDays < 7) {
             return res.status(403).json({
@@ -34,8 +35,8 @@ export const submitWeeklyCheckup = async (req, res) => {
             orderBy: { created_at: 'desc' }
         });
 
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(now.getDate() - 7);
+        const sevenDaysAgoLocal = now.startOf('day').subtract(7, 'day');
+        const sevenDaysAgo = dayjs.utc(sevenDaysAgoLocal.format('YYYY-MM-DD'), 'YYYY-MM-DD', true).toDate();
 
         const recentLogs = await prisma.journalLog.findMany({
             where: {
@@ -135,8 +136,8 @@ export const submitWeeklyCheckup = async (req, res) => {
                     total_score: total_score,
                     ai_summary: aiResponse.ai_summary,
                     ai_insights: aiResponse.ai_insights,
-                    started_at: now,
-                    completed_at: now
+                    started_at: now.toDate(),
+                    completed_at: now.toDate()
                 }
             });
 
@@ -144,7 +145,7 @@ export const submitWeeklyCheckup = async (req, res) => {
                 quiz_id: newQuiz.id,
                 question_id: ans.question_id,
                 selected_option_id: ans.selected_option_id,
-                answered_at: now
+                answered_at: now.toDate()
             }));
             await tx.quizAnswer.createMany({ data: answersData });
 

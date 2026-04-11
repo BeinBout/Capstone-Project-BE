@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import dayjs from '../utils/dayjs.js';
 
 export const getDashboardStats = async (req, res) => {
     try {
@@ -66,9 +67,8 @@ export const getDashboardChart = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-        sevenDaysAgo.setUTCHours(0, 0, 0, 0);
+        const sevenDaysAgoLocal = dayjs().tz('Asia/Jakarta').startOf('day').subtract(6, 'day');
+        const sevenDaysAgo = dayjs.utc(sevenDaysAgoLocal.format('YYYY-MM-DD'), 'YYYY-MM-DD', true).toDate();
 
         const logs = await prisma.journalLog.findMany({
             where: {
@@ -88,7 +88,7 @@ export const getDashboardChart = async (req, res) => {
         });
 
         const chartData = logs.map(log => ({
-            date: log.entry_date.toISOString().split('T')[0],
+            date: dayjs.utc(log.entry_date).format('YYYY-MM-DD'),
             mood_intensity: log.mood_intensity,
             sleep_duration_hours: log.sleep_duration_hours ? parseFloat(log.sleep_duration_hours) : 0
         }));
@@ -118,9 +118,9 @@ export const isWeeklyCheckupAvailable = async (req, res) => {
             orderBy: { created_at: 'desc' }
         });
 
-        const now = new Date();
-        const lastQuizDate = new Date(lastQuiz.completed_at);
-        const diffDays = Math.ceil(Math.abs(now - lastQuizDate) / (1000 * 60 * 60 * 24));
+        const now = dayjs().tz('Asia/Jakarta');
+        const lastQuizDate = dayjs(lastQuiz.completed_at).tz('Asia/Jakarta');
+        const diffDays = now.startOf('day').diff(lastQuizDate.startOf('day'), 'day');
 
         const isAvailable = diffDays >= 7 ? true : false;
 
