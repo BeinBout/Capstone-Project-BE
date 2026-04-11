@@ -1,6 +1,7 @@
 import prisma from '../config/db.js';
 import redisClient from '../config/redis.js';
 import { analyzeDailyJournal } from '../utils/aiHelper.js';
+import dayjs from '../utils/dayjs.js';
 
 const calculateSleepDuration = (sleepTime, wakeTime) => {
     if (!sleepTime || !wakeTime) return 0;
@@ -34,13 +35,18 @@ export const submitDailyJournal = async (req, res) => {
             is_private
         } = req.body;
 
-        const inputDate = new Date(journal_date);
-        const today = new Date();
+        const inputDate = dayjs.tz(journal_date, 'YYYY-MM-DD', 'Asia/Jakarta').startOf('day');
+        const today = dayjs().tz('Asia/Jakarta').startOf('day');
+        const inputDateForDb = dayjs.utc(inputDate.format('YYYY-MM-DD'), 'YYYY-MM-DD', true);
 
-        inputDate.setUTCHours(0, 0, 0, 0);
-        today.setUTCHours(0, 0, 0, 0);
+        if (!inputDate.isValid()) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invalid journal_date format. Use YYYY-MM-DD'
+            });
+        }
 
-        if (inputDate > today) {
+        if (inputDate.isAfter(today)) {
             return res.status(400).json({
                 status: 'error',
                 message: 'Cannot submit journal for future date'
@@ -50,10 +56,9 @@ export const submitDailyJournal = async (req, res) => {
         const existingJournal = await prisma.journalLog.findFirst({
             where: {
                 user_id: userId,
-                entry_date: inputDate
+                entry_date: inputDateForDb.toDate()
             }
         });
-        console.log(existingJournal);
 
         if (existingJournal) {
             return res.status(400).json({
@@ -62,19 +67,31 @@ export const submitDailyJournal = async (req, res) => {
             });
         }
 
-        const formattedSleepTime = sleep_time ? new Date(`1970-01-01T${sleep_time}:00.000Z`) : null;
-        const formattedWakeTime = wake_time ? new Date(`1970-01-01T${wake_time}:00.000Z`) : null;
+        const formattedSleepTime = sleep_time
+            ? dayjs.tz(`1970-01-01 ${sleep_time}`, 'YYYY-MM-DD HH:mm', 'Asia/Jakarta')
+            : null;
+        const formattedWakeTime = wake_time
+            ? dayjs.tz(`1970-01-01 ${wake_time}`, 'YYYY-MM-DD HH:mm', 'Asia/Jakarta')
+            : null;
+
+        if ((formattedSleepTime && !formattedSleepTime.isValid()) || (formattedWakeTime && !formattedWakeTime.isValid())) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Invalid sleep_time or wake_time format. Use HH:mm'
+            });
+        }
+
         const sleep_duration_hours = calculateSleepDuration(sleep_time, wake_time);
 
         if (is_private === true) {
             const newJournal = await prisma.journalLog.create({
                 data: {
                     user_id: userId,
-                    entry_date: inputDate,
+                    entry_date: inputDateForDb.toDate(),
                     mood,
                     mood_intensity,
-                    sleep_time: formattedSleepTime,
-                    wake_time: formattedWakeTime,
+                    sleep_time: formattedSleepTime ? formattedSleepTime.toDate() : null,
+                    wake_time: formattedWakeTime ? formattedWakeTime.toDate() : null,
                     sleep_duration_hours,
                     sleep_quality,
                     content,
@@ -82,7 +99,7 @@ export const submitDailyJournal = async (req, res) => {
                 }
             });
 
-            await redisClient.del(`journals:${userId}:${inputDate.getMonth()+1}:${inputDate.getFullYear()}`);
+            await redisClient.del(`journals:${userId}:${inputDate.month() + 1}:${inputDate.year()}`);
 
             return res.status(201).json({
                 status: 'success',
@@ -107,13 +124,13 @@ export const submitDailyJournal = async (req, res) => {
             select: { risk_level: true, risk_score: true, dominant_stressor: true }
         });
 
-        const threeDaysAgo = new Date(inputDate);
-        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+        const threeDaysAgo = inputDate.subtract(3, 'day');
+        const threeDaysAgoForDb = dayjs.utc(threeDaysAgo.format('YYYY-MM-DD'), 'YYYY-MM-DD', true);
 
         const pastLogs = await prisma.journalLog.findMany({
             where: {
                 user_id: userId,
-                entry_date: { gte: threeDaysAgo, lt: inputDate }
+                entry_date: { gte: threeDaysAgoForDb.toDate(), lt: inputDateForDb.toDate() }
             },
             orderBy: { entry_date: 'desc' }
         });
@@ -150,11 +167,11 @@ export const submitDailyJournal = async (req, res) => {
         const newJournal = await prisma.journalLog.create({
             data: {
                 user_id: userId,
-                entry_date: inputDate,
+                entry_date: inputDateForDb.toDate(),
                 mood,
                 mood_intensity,
-                sleep_time: formattedSleepTime,
-                wake_time: formattedWakeTime,
+                sleep_time: formattedSleepTime ? formattedSleepTime.toDate() : null,
+                wake_time: formattedWakeTime ? formattedWakeTime.toDate() : null,
                 sleep_duration_hours,
                 sleep_quality,
                 content,
@@ -168,7 +185,7 @@ export const submitDailyJournal = async (req, res) => {
             }
         });
 
-        await redisClient.del(`journals:${userId}:${inputDate.getMonth()+1}:${inputDate.getFullYear()}`);
+        await redisClient.del(`journals:${userId}:${inputDate.month() + 1}:${inputDate.year()}`);
 
         return res.status(201).json({
             status: 'success',
@@ -191,7 +208,12 @@ export const submitDailyJournal = async (req, res) => {
 
 export const getJournalsByMonth = async (req, res) => {
     try {
-        const cachedJournal = await redisClient.get(`journals:${req.user.id}:${req.query.month}:${req.query.year}`);
+        const today = dayjs().tz('Asia/Jakarta');
+        const queryMonth = req.query.month ? parseInt(req.query.month, 10) : today.month() + 1;
+        const queryYear = req.query.year ? parseInt(req.query.year, 10) : today.year();
+        const cacheKey = `journals:${req.user.id}:${queryMonth}:${queryYear}`;
+
+        const cachedJournal = await redisClient.get(cacheKey);
 
         if (cachedJournal) {
             res.status(200).json({
@@ -200,18 +222,25 @@ export const getJournalsByMonth = async (req, res) => {
             });
         } else {
             const userId = req.user.id;
-            const today = new Date();
-            const queryMonth = req.query.month ? parseInt(req.query.month, 10) : today.getMonth() + 1;
-            const queryYear = req.query.year ? parseInt(req.query.year, 10) : today.getFullYear();
-            const startDate = new Date(queryYear, queryMonth - 1, 1);
-            const endDate = new Date(queryYear, queryMonth, 1);
+            const startDate = dayjs.tz(`${queryYear}-${String(queryMonth).padStart(2, '0')}-01`, 'YYYY-MM-DD', 'Asia/Jakarta');
+
+            if (!startDate.isValid()) {
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'Invalid month or year query'
+                });
+            }
+
+            const endDate = startDate.add(1, 'month');
+            const startDateForDb = dayjs.utc(startDate.format('YYYY-MM-DD'), 'YYYY-MM-DD', true);
+            const endDateForDb = dayjs.utc(endDate.format('YYYY-MM-DD'), 'YYYY-MM-DD', true);
     
             const journals = await prisma.journalLog.findMany({
                 where: {
                     user_id: userId,
                     entry_date: {
-                        gte: startDate,
-                        lt: endDate
+                        gte: startDateForDb.toDate(),
+                        lt: endDateForDb.toDate()
                     }
                 },
                 select: {
@@ -225,7 +254,7 @@ export const getJournalsByMonth = async (req, res) => {
                 }
             });
 
-            await redisClient.setEx(`journals:${userId}:${queryMonth}:${queryYear}`, 86400, JSON.stringify(journals));
+            await redisClient.setEx(cacheKey, 86400, JSON.stringify(journals));
 
             res.status(200).json({
                 status: 'success',
@@ -245,9 +274,7 @@ export const getJournalsByMonth = async (req, res) => {
 const formatTimeBackToString = (dateObj) => {
     if (!dateObj) return null;
 
-    const h = dateObj.getUTCHours().toString().padStart(2, '0');
-    const m = dateObj.getUTCMinutes().toString().padStart(2, '0');
-    return `${h}:${m}`;
+    return dayjs(dateObj).tz('Asia/Jakarta').format('HH:mm');
 };
 
 export const getJournalById = async (req, res) => {
